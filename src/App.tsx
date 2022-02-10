@@ -4,27 +4,19 @@ import "./App.css"
 import { db } from "./firebase"
 
 import io from "socket.io-client"
+import { useApp } from "./hooks/useApp"
 
 const socket = io("http://localhost:3001", { transports: ["websocket"] })
 
 const App = () => {
   const [state, setState] = useState({ message: "", name: "" })
-  const [chat, setChat] = useState([{ message: "test", name: "123" }])
+  const { chat, setChat, storeChat } = useApp()
 
-  useEffect(() => {
-    db.collection("123")
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          console.log("doc,", doc.data())
-        })
-      })
-  }, [])
   useEffect(() => {
     socket.on("message", ({ name, message }) => {
       setChat([...chat, { name: name, message: message }])
     })
-  }, [chat])
+  }, [chat, setChat])
 
   const renderChat = () => {
     return chat.map(({ name, message }, index) => {
@@ -40,7 +32,7 @@ const App = () => {
   const sendMessage = (e: any) => {
     e.preventDefault()
     socket.emit("message", { name: state.name, message: state.message })
-    console.log("name")
+    storeChat(state.name, state.message)
     setState({ message: "", name: "" })
   }
 
