@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import logo from "./logo.svg"
 import "./App.css"
+import { db } from "./firebase"
 
 import io from "socket.io-client"
 
@@ -10,6 +11,15 @@ const App = () => {
   const [state, setState] = useState({ message: "", name: "" })
   const [chat, setChat] = useState([{ message: "test", name: "123" }])
 
+  useEffect(() => {
+    db.collection("123")
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          console.log("doc,", doc.data())
+        })
+      })
+  }, [])
   useEffect(() => {
     socket.on("message", ({ name, message }) => {
       setChat([...chat, { name: name, message: message }])
